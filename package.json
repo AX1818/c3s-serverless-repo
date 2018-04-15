@@ -1,0 +1,20 @@
+{
+  "name": "c3s-serverless-repo",
+  "version": "0.1.0",
+  "description": "graphql serverless repo for c3s",
+  "main": "handler.js",
+  "repository": "git@githubAX1818:AX1818/c3s-serverless-repo.git",
+  "author": "Austin Xie <austin.xie1818@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.224.1",
+    "graphql": "^0.13.2"
+  },
+  "devDependencies": {
+    "jest": "^22.4.3",
+    "prettier": "1.12.0"
+  }
+}
