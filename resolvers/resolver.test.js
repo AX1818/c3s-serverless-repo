@@ -3,20 +3,18 @@ const {
   buildSchema
 } = require('graphql');
 
-const {schema} = require('../schema/schema');
-const {clothResolver} = require('./cloth.resolver');
+const {schema} = require('../schema');
+const {resolovers} = require('./index');
 
 test('test resolving clothes and its schema', ()=> {
   graphql(schema, `query { 
-    clothes(id: 1, tags: {tags: ["FAKE", "TAG"]}) {
+    clothes(id: 101, tags: ["Autum", "Winter"]) {
       id
       name
+      price
     }
   }`,
-
-  clothResolver).then(resp => {
-
-    console.log('resp: ', JSON.stringify(resp));
-
+  resolovers).then(clothes => {
+    console.log('clothes: ', JSON.stringify(clothes));
   });
 });

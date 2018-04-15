@@ -9,16 +9,24 @@ module.exports.schema = buildSchema(`
     tags: [String]
   }
 
-  type Cloth {
+  enum SaleStatus {
+    SOLD
+    AVAILABLE
+  }
+
+  type Clothe {
     id: Int!
     name: String
     category: String
     price: Float
+    status: SaleStatus
+    tags: [String]
   }
 
   type Query {
-    clothes(id: Int, tags: Tags): [Cloth]
+    clothes(id: Int, tags: [String]): [Clothe]
   }
+
 `);
 
 
@@ -42,7 +50,7 @@ module.exports.schema = buildSchema(`
   }
 
 
-    type Cloth {
+  type Cloth {
     id: Int!
     name: String
     photos: [Photo]
