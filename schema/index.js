@@ -4,59 +4,30 @@ const {
 } = require('graphql');
 
 module.exports.schema = buildSchema(`
-
-  input Tags {
-    tags: [String]
+  type Tag {
+    pkId: String!
+    type: String!
+    tag: String!
   }
 
-  enum SaleStatus {
+  enum Status {
     SOLD
     AVAILABLE
   }
 
   type Clothe {
-    id: Int!
-    name: String
+    pkId: String!
+    name: String!
     category: String
     price: Float
-    status: SaleStatus
-    tags: [String]
+    status: String
+    tags: [Tag]
   }
 
   type Query {
-    clothes(id: Int, tags: [String]): [Clothe]
+    clothes(pkIds: [String]): [Clothe]
+    clothe(pkId: String): Clothe
+    tags: [Tag]
   }
 
 `);
-
-
-/*
-  type Tag {
-    id: Int!
-    tag: String
-  }
-
-  type Photo {
-    id: Int!
-    uri: String!
-    width: Int
-    height: Int
-    creationDate: Int
-  }
-
-  enum SaleStatus {
-    SOLD
-    AVAILABLE
-  }
-
-
-  type Cloth {
-    id: Int!
-    name: String
-    photos: [Photo]
-    tags: [Tag]
-    category: String
-    price: Float
-    status: SaleStatus
-  }
-  */
