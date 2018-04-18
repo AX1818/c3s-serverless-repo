@@ -4,6 +4,11 @@ const {
 } = require('graphql');
 
 module.exports.schema = buildSchema(`
+  input TagInput {
+    pkId: String!
+    tag: String!
+  }
+
   type Tag {
     pkId: String!
     type: String!
@@ -28,6 +33,11 @@ module.exports.schema = buildSchema(`
     clothes(pkIds: [String]): [Clothe]
     clothe(pkId: String): Clothe
     tags: [Tag]
+  }
+
+  type Mutation {
+    addTag(tag: String!): Tag
+    updateTag(tag: TagInput): Tag
   }
 
 `);

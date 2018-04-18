@@ -1,5 +1,7 @@
 'use strict';
 
+const uuidv4 = require('uuid/v4');
+
 const AWS = require('aws-sdk');
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
@@ -14,14 +16,13 @@ const promisify = foo => new Promise((resolve, reject) => {
   })
 });
 
+const paramTable = {
+  TableName : process.env.DYNAMODB_TABLE || 'c3s_boutique_clothes'
+};
 
 module.exports.resolovers = {
   clothes({pkIds}) {
-    console.log('query aprams: ', JSON.stringify(pkIds));
-    let params = {
-      TableName : process.env.DYNAMODB_TABLE || 'c3s_boutique_clothes'
-    };
-
+    const params = { ...paramTable };
     if (pkIds && pkIds.length) {
       params.ScanFilter = {...params.ScanFilter,
         'pkId' : {
@@ -43,15 +44,14 @@ module.exports.resolovers = {
   },
 
   tags() {
-    let params = {
-      TableName : process.env.DYNAMODB_TABLE || 'c3s_boutique_clothes'
-    };
-
-    params.ScanFilter = {...params.ScanFilter,
-      'type' : {
-        ComparisonOperator: 'EQ',
-        AttributeValueList: [ 'T' ]
-      },
+    const params = {
+      ...paramTable,
+      ScanFilter: {
+        'type': {
+          ComparisonOperator: 'EQ',
+          AttributeValueList: ['T']
+        }
+      }
     };
 
     console.log('dynammo params: ', JSON.stringify(params));
@@ -60,11 +60,7 @@ module.exports.resolovers = {
   },
 
   clothe({pkId}) {
-    console.log('query aprams: ---- ', JSON.stringify({pkId}));
-    let params = {
-      TableName : process.env.DYNAMODB_TABLE || 'c3s_boutique_clothes'
-    };
-
+    const params = { ...paramTable };
     if (pkId) {
       params.ScanFilter = {...params.ScanFilter,
         'pkId' : {
@@ -89,4 +85,41 @@ module.exports.resolovers = {
       return clothe;
     });
   },
+
+  addTag({tag}) {
+    const pkId = uuidv4();
+    const params = {
+      ...paramTable,
+      Item: {
+        pkId,
+        skId: pkId,
+        type: 'T',
+        tag
+     }
+    };
+
+    return promisify(callback => dynamoDb.put(params, callback))
+    .then(result => {
+      console.log("result: ", result);
+      return params.Item;
+    });
+  },
+
+  updateTag({tag}) {
+    console.log('upateTag --: ', JSON.stringify(tag));
+    const params = {
+      ...paramTable,
+      Item: { ...tag, skId: tag.pkId, type: 'T' },
+      ReturnValues: 'ALL_OLD'
+    };
+
+    return promisify(callback => dynamoDb.put(params, callback))
+    .then(result => {
+      // console.log('result tag: ', JSON.stringify(result));
+      return result.Attributes;
+    });
+  }
+
+
+  
 };
