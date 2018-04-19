@@ -20,12 +20,30 @@ module.exports.schema = buildSchema(`
     AVAILABLE
   }
 
+  type AttributeUpdate {
+    attribute: String!
+
+  }
+
+  input ClotheInput {
+    pkId: String
+    name: String!
+    category: String
+    price: Float
+    status: String
+    toRemove: String
+    addAttrs: [String]
+    deleteAttrs: [String]
+    putAttrs: [String]
+  }
+
   type Clothe {
     pkId: String!
     name: String!
     category: String
     price: Float
     status: String
+    toRemove: String
     tags: [Tag]
   }
 
@@ -36,8 +54,10 @@ module.exports.schema = buildSchema(`
   }
 
   type Mutation {
+    addClothe(clothe: ClotheInput!): Clothe
+    updateClothe(clothe: ClotheInput!): Clothe
     addTag(tag: String!): Tag
-    updateTag(tag: TagInput): Tag
+    updateTag(tag: TagInput!): Tag
   }
 
 `);

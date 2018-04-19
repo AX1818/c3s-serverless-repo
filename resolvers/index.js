@@ -86,6 +86,74 @@ module.exports.resolovers = {
     });
   },
 
+  addClothe({clothe}) {
+    const pkId = uuidv4();
+    const params = {
+      ...paramTable,
+      Item: {
+        ...clothe,
+        pkId,
+        skId: pkId,
+        type: 'C'
+     }
+    };
+
+    return promisify(callback => dynamoDb.put(params, callback))
+    .then(result => {
+      console.log("New Clothe: ", result);
+      return params.Item;
+    });
+  },
+
+  updateClothe({clothe}) {
+    let attributeUpdates = {};
+    clothe.addAttrs && clothe.addAttrs.forEach(attr => attributeUpdates = {...attributeUpdates,
+      [attr]: { Action: 'ADD', Value: clothe[attr] }
+    });
+    clothe.deleteAttrs && clothe.deleteAttrs.forEach(attr => attributeUpdates = {...attributeUpdates,
+      [`${attr}`]: { Action: 'DELETE' }
+    });
+    clothe.putAttrs && clothe.putAttrs.forEach(attr => attributeUpdates = {...attributeUpdates,
+      [`${attr}`]: { Action: 'PUT', Value: clothe[`${attr}`] }
+    });
+
+    const params = {
+      ...paramTable,
+      Key: {pkId: clothe.pkId, skId: clothe.pkId},
+      AttributeUpdates: attributeUpdates,
+      ReturnValues: 'ALL_OLD'
+    };
+
+    console.log('upateClothe params ', JSON.stringify(params));
+
+    return promisify(callback => dynamoDb.update(params, callback))
+    .then(result => {
+      // console.log('result tag: ', JSON.stringify(result));
+      return result.Attributes;
+    });
+  },
+
+  updateTag({tag}) {
+    console.log('upateTag --: ', JSON.stringify(tag));
+    const params = {
+      ...paramTable,
+      Key: {pkId: tag.pkId, skId: tag.pkId},
+      AttributeUpdates: { 
+        tag: {
+          Action: 'PUT',
+          Value: tag.tag
+        }
+      },
+      ReturnValues: 'ALL_OLD'
+    };
+
+    return promisify(callback => dynamoDb.update(params, callback))
+    .then(result => {
+      // console.log('result tag: ', JSON.stringify(result));
+      return result.Attributes;
+    });
+  },
+
   addTag({tag}) {
     const pkId = uuidv4();
     const params = {
@@ -104,21 +172,6 @@ module.exports.resolovers = {
       return params.Item;
     });
   },
-
-  updateTag({tag}) {
-    console.log('upateTag --: ', JSON.stringify(tag));
-    const params = {
-      ...paramTable,
-      Item: { ...tag, skId: tag.pkId, type: 'T' },
-      ReturnValues: 'ALL_OLD'
-    };
-
-    return promisify(callback => dynamoDb.put(params, callback))
-    .then(result => {
-      // console.log('result tag: ', JSON.stringify(result));
-      return result.Attributes;
-    });
-  }
 
 
   
